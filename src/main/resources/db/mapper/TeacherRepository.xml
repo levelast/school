@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="ru.improve.universityserver.domain.repository.custom.TeacherRepository">
+
+    <resultMap id="teacherResultMap" type="ru.improve.universityserver.domain.entity.Teacher">
+        <result column="teacher_id" property="id"/>
+        <result column="teacher_name" property="name"/>
+        <result column="teacher_hiredate" property="hireDate"/>
+        <collection property="subjects" ofType="ru.improve.universityserver.domain.entity.Subject"
+                    resultMap="ru.improve.universityserver.domain.repository.custom.SubjectRepository.subjectResultMap"/>
+    </resultMap>
+    
+    <sql id="teacherColumns">
+        teacher.id AS teacher_id,
+        teacher.name AS teacher_name,
+        teacher.hiredate AS teacher_hiredate
+    </sql>
+
+    <sql id="teacherJoins">
+        LEFT JOIN teachersubject AS teachersubject ON teachersubject.teacherid = teacher.id
+        LEFT JOIN subject AS subject ON subject.id = teachersubject.subjectid
+    </sql>
+
+    <sql id="teacherColumnsWithJoinColumns">
+        <include refid="teacherColumns"/>,
+        <include refid="ru.improve.universityserver.domain.repository.custom.SubjectRepository.subjectColumns"/>
+    </sql>
+
+    <sql id="teacherFromWithColumns">
+        <include refid="teacherColumnsWithJoinColumns"/>
+        FROM teacher AS teacher
+        <include refid="teacherJoins"/>
+    </sql>
+
+    <insert id="save" parameterType="ru.improve.universityserver.domain.entity.Teacher">
+        INSERT INTO teacher(
+            <if test="entity.id != null">id,</if>
+            name,
+            hiredate
+        ) VALUES (
+            <if test="entity.id != null">#{entity.id},</if>
+            #{entity.name},
+            #{entity.hireDate}
+        ) ON CONFLICT (id) DO UPDATE SET
+        name = #{entity.name},
+        hiredate = #{entity.hireDate}
+    </insert>
+
+    <delete id="delete" parameterType="java.lang.Long">
+        WITH teacher_ids AS (
+            DELETE FROM teacher
+            WHERE id = #{id}
+            RETURNING id)
+        DELETE FROM teachersubject WHERE teacherid IN (
+            SELECT id FROM teacher_ids)
+    </delete>
+
+    <select id="findOne" resultMap="teacherResultMap" parameterType="java.lang.Long">
+        SELECT
+        <include refid="teacherColumns"/>
+        FROM teacher
+        WHERE id = #{id}
+    </select>
+
+    <select id="findOneWithDependencies" resultMap="teacherResultMap" parameterType="java.lang.Long">
+        SELECT
+        <include refid="teacherFromWithColumns"/>
+        WHERE teacher.id = #{id}
+    </select>
+
+</mapper>

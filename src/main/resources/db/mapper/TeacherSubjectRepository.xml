@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="ru.improve.universityserver.domain.repository.custom.TeacherSubjectRepository">
+
+    <insert id="save">
+        INSERT INTO teachersubject (teacherid, subjectid)
+        VALUES (#{teacherId}, #{subjectId})
+    </insert>
+
+    <!-- TODO: add deleting subjects -->
+    <delete id="deleteByTeacherId" parameterType="java.lang.Long">
+        DELETE FROM teachersubject
+        WHERE teacherid = #{teacherId}
+    </delete>
+
+</mapper>

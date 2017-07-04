@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="ru.improve.universityserver.domain.repository.custom.SubjectRepository">
+
+    <resultMap id="subjectResultMap" type="ru.improve.universityserver.domain.entity.Subject">
+        <result column="subject_id" property="id"/>
+        <result column="subject_name" property="name"/>
+    </resultMap>
+
+    <sql id="subjectColumns">
+        subject.id AS subject_id,
+        subject.name AS subject_name
+    </sql>
+
+    <insert id="save" parameterType="ru.improve.universityserver.domain.entity.Subject">
+        INSERT INTO subject (
+        <if test="entity.id != null">id,</if>
+        name
+        ) VALUES (
+            <if test="entity.id != null">#{entity.id},</if>
+            #{entity.name}
+        ) ON CONFLICT (id) DO UPDATE SET
+        name = #{entity.name}
+    </insert>
+
+    <delete id="delete" parameterType="java.lang.Long">
+        WITH subject_ids AS (
+            DELETE FROM subject
+            WHERE id = #{id}
+            RETURNING id)
+        DELETE FROM teachersubject
+        WHERE subjectid IN (
+            SELECT id FROM subject_ids)
+    </delete>
+
+    <select id="findOne" parameterType="java.lang.Long" resultMap="subjectResultMap">
+        SELECT
+        <include refid="subjectColumns"/>
+        FROM subject
+        WHERE id = #{id}
+    </select>
+
+    <select id="findOneWithDependencies" parameterType="java.lang.Long" resultMap="subjectResultMap">
+        SELECT
+        <include refid="subjectColumns"/>
+        FROM subject
+        WHERE id = #{id}
+    </select>
+
+</mapper>
