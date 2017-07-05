@@ -68,4 +68,27 @@
         WHERE teacher.id = #{id}
     </select>
 
+    <select id="getName" resultType="java.lang.String">
+        SELECT name
+        FROM teacher
+        WHERE id = #{id}
+    </select>
+
+    <select id="findByFilter" resultMap="teacherResultMap" parameterType="ru.improve.universityserver.dto.filter.TeacherFilter">
+        SELECT
+        <include refid="teacherFromWithColumns"/>
+        <where>
+            <if test="filter.name != null and filter.name != ''">
+                <bind name="preparedName" value="'%' + filter.name + '%'"/>
+                teacher.name ILIKE #{preparedName}
+            </if>
+            <if test="filter.startHireDate != null">
+               AND teacher.hiredate &gt; #{filter.startHireDate}
+            </if>
+            <if test="filter.endHireDate != null">
+                AND teacher.hiredate &lt; #{filter.endHireDate}
+            </if>
+        </where>
+    </select>
+
 </mapper>

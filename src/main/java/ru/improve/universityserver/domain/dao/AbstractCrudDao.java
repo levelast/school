@@ -27,7 +27,6 @@ public abstract class AbstractCrudDao<Entity, Id> implements CrudRepository<Enti
     }
 
     @Override
-    @Transactional
     public abstract void saveWithDependencies(Entity entity);
 
     protected abstract CrudRepository<Entity, Id> getRepository();

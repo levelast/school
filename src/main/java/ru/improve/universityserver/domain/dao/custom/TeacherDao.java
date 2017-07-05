@@ -3,12 +3,14 @@ package ru.improve.universityserver.domain.dao.custom;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 import ru.improve.universityserver.domain.dao.AbstractCrudDao;
 import ru.improve.universityserver.domain.entity.Subject;
 import ru.improve.universityserver.domain.entity.Teacher;
 import ru.improve.universityserver.domain.repository.CrudRepository;
 import ru.improve.universityserver.domain.repository.custom.TeacherRepository;
 import ru.improve.universityserver.domain.repository.custom.TeacherSubjectRepository;
+import ru.improve.universityserver.dto.filter.TeacherFilter;
 
 import java.util.List;
 
@@ -25,6 +27,7 @@ public class TeacherDao extends AbstractCrudDao<Teacher, Long> {
     }
 
     @Override
+    @Transactional
     public void saveWithDependencies(Teacher teacher) {
         if (teacher.getId() != null) {
             teacherSubjectRepository.deleteByTeacherId(teacher.getId());
@@ -34,6 +37,14 @@ public class TeacherDao extends AbstractCrudDao<Teacher, Long> {
         if (CollectionUtils.isNotEmpty(subjects)) {
             subjects.forEach(subject -> teacherSubjectRepository.save(teacher.getId(), subject.getId()));
         }
+    }
+
+    public String getName(Long id) {
+        return teacherRepository.getName(id);
+    }
+
+    public List<Teacher> findByFilter(TeacherFilter filter) {
+        return teacherRepository.findByFilter(filter);
     }
 
     @Override
