@@ -2,6 +2,7 @@ package ru.improve.universityserver.domain.dao.custom;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 import ru.improve.universityserver.domain.entity.Subject;
 import ru.improve.universityserver.domain.dao.AbstractCrudDao;
 import ru.improve.universityserver.domain.repository.CrudRepository;
@@ -18,6 +19,7 @@ public class SubjectDao extends AbstractCrudDao<Subject, Long> {
     }
 
     @Override
+    @Transactional
     public void saveWithDependencies(Subject subject) {
         subjectRepository.save(subject);
     }
